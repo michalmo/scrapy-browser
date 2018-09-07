@@ -1,0 +1,2 @@
+Scrapy==1.5.1
+https://github.com/michalmo/scrapy-browser/archive/master.zip
