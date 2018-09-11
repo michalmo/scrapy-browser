@@ -22,7 +22,7 @@ class ProductItem(scrapy.Item):
         output_processor=Compose(Join(), strip, lambda p: p.split()[-1])
     )
     location = scrapy.Field(
-        output_processor=Compose(Join(), lambda p: p.strip('()'))
+        output_processor=Compose(Join(), strip, lambda p: p.strip('()'))
     )
 
 
