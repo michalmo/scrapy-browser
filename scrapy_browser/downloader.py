@@ -9,6 +9,7 @@ from twisted.internet import defer, reactor, protocol
 from twisted.web.http_headers import Headers as TxHeaders
 from twisted.internet.error import TimeoutError
 from twisted.web.client import Agent, HTTPConnectionPool
+
 try:
     from twisted.web.client import URI
 except ImportError:
@@ -135,11 +136,12 @@ class _ResponseReader(protocol.Protocol):
         self._awaiting = collections.deque()
 
     def dataReceived(self, bodyBytes):
-        parts = bodyBytes.split(b'\n\n')
+        parts = bodyBytes.split(b'\r\n\r\n')
         for part in parts[:-1]:
             self._bodybuf.write(part)
             self._messages.append(self._bodybuf.getvalue())
             self._bodybuf.truncate(0)
+
         self._bodybuf.write(parts[-1])
         self._bytes_received += len(bodyBytes)
         self.resolve_responses()
@@ -179,10 +181,11 @@ class _ResponseReader(protocol.Protocol):
 
     @staticmethod
     def extract_response(message):
-        _, data_line = message.decode().split('\n', 1)
+        lines = message.decode().split('\n', 1)
+        data_line = next((l for l in lines if l.startswith('data: ')), '{}')
         _, json_data = data_line.split(': ', 1)
         data = json.loads(json_data)
         return {
             **data,
-            'body': base64.decodebytes(data['body'].encode('ascii')),
+            'body': data['body'].encode('utf-8')
         }

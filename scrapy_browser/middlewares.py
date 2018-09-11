@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 
 
 class BrowserDownloaderMiddleware(object):
-    default_adapter_url = 'http://127.0.0.1:8050'
-    default_endpoint = "render.json"
+    default_adapter_url = 'http://127.0.0.1:8080'
+    default_endpoint = "stream.json"
 
     def __init__(self, crawler, browser_adapter_url):
         self.crawler = crawler
